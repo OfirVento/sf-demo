@@ -1,0 +1,1 @@
+{"root":["./vite.config.ts","./scripts/generate-payload.ts","./scripts/generate-types.ts","./scripts/screenshot-m1.ts","./scripts/validate-payload.ts"],"version":"5.9.3"}

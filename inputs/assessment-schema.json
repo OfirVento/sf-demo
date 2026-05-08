@@ -7,6 +7,7 @@
   "required": [
     "meta",
     "orgProfile",
+    "verdict",
     "complexityScores",
     "topConcerns",
     "loeEstimate",
@@ -67,6 +68,19 @@
             }
           }
         }
+      }
+    },
+
+    "verdict": {
+      "type": "object",
+      "required": ["recommendation", "rationale"],
+      "additionalProperties": false,
+      "properties": {
+        "recommendation": {
+          "type": "string",
+          "enum": ["Proceed", "Proceed_With_Caution", "Needs_Deeper_Discovery"]
+        },
+        "rationale": { "type": "string" }
       }
     },
 

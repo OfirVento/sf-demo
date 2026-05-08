@@ -1,0 +1,13 @@
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .no-print,
+  [data-no-print='true'] {
+    display: none !important;
+  }
+  .print-page {
+    page-break-after: always;
+  }
+}
