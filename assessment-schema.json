@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vento.app/schemas/assessment-payload-v1.json",
+  "title": "AssessmentPayload",
+  "description": "Vento CPQ→RCA Assessment Tool — full assessment payload contract. The app consumes this at runtime; every visualization, AI claim, and migration draft is grounded in this file.",
+  "type": "object",
+  "required": [
+    "meta",
+    "orgProfile",
+    "complexityScores",
+    "topConcerns",
+    "loeEstimate",
+    "rcaOpportunities",
+    "expansionSignals",
+    "codeInventory",
+    "rcaBenefitMapping",
+    "salesTalkingPoints",
+    "implementationFindings",
+    "aiNarratives"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["assessmentId", "generatedAt", "orgName", "orgIdentifier", "truthLabel", "schemaVersion"],
+      "additionalProperties": false,
+      "properties": {
+        "assessmentId": { "type": "string" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "orgName": { "type": "string" },
+        "orgIdentifier": { "type": "string", "description": "Hashed/redacted Salesforce org ID" },
+        "truthLabel": { "type": "string", "enum": ["real_org_data", "sample_data"] },
+        "schemaVersion": { "type": "string", "const": "1.0" }
+      }
+    },
+
+    "orgProfile": {
+      "type": "object",
+      "required": ["edition", "cpqVersion", "activeUsers", "dataVolume", "integrations"],
+      "additionalProperties": false,
+      "properties": {
+        "edition": { "type": "string" },
+        "cpqVersion": { "type": "string" },
+        "activeUsers": { "type": "integer", "minimum": 0 },
+        "dataVolume": {
+          "type": "object",
+          "required": ["products", "activeQuotes", "historicalQuotes", "activeContracts", "activeSubscriptions"],
+          "additionalProperties": false,
+          "properties": {
+            "products": { "type": "integer", "minimum": 0 },
+            "activeQuotes": { "type": "integer", "minimum": 0 },
+            "historicalQuotes": { "type": "integer", "minimum": 0 },
+            "activeContracts": { "type": "integer", "minimum": 0 },
+            "activeSubscriptions": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "direction"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["erp", "billing", "tax", "cpq_extension", "other"] },
+              "direction": { "type": "string", "enum": ["inbound", "outbound", "bidirectional"] }
+            }
+          }
+        }
+      }
+    },
+
+    "complexityScores": {
+      "type": "object",
+      "required": ["overall", "overallNumeric", "dimensions"],
+      "additionalProperties": false,
+      "properties": {
+        "overall": { "$ref": "#/$defs/ComplexityTier" },
+        "overallNumeric": { "type": "number", "minimum": 0, "maximum": 100 },
+        "dimensions": {
+          "type": "object",
+          "required": ["pricingLogic", "productCatalog", "customCode", "dataMigration", "integrations", "deprecatedConfig"],
+          "additionalProperties": false,
+          "properties": {
+            "pricingLogic": { "$ref": "#/$defs/ScoredDimension" },
+            "productCatalog": { "$ref": "#/$defs/ScoredDimension" },
+            "customCode": { "$ref": "#/$defs/ScoredDimension" },
+            "dataMigration": { "$ref": "#/$defs/ScoredDimension" },
+            "integrations": { "$ref": "#/$defs/ScoredDimension" },
+            "deprecatedConfig": { "$ref": "#/$defs/ScoredDimension" }
+          }
+        }
+      }
+    },
+
+    "topConcerns": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 7,
+      "items": { "$ref": "#/$defs/Concern" }
+    },
+
+    "loeEstimate": {
+      "type": "object",
+      "required": [
+        "tier",
+        "weeksLow",
+        "weeksHigh",
+        "confidence",
+        "confidenceLimitingFactors",
+        "primaryDrivers",
+        "suggestedPhases",
+        "sowCaveats",
+        "changeOrderRisks",
+        "disclaimer"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "tier": { "$ref": "#/$defs/ComplexityTier" },
+        "weeksLow": { "type": "integer", "minimum": 1 },
+        "weeksHigh": { "type": "integer", "minimum": 1 },
+        "confidence": { "$ref": "#/$defs/ConfidenceLevel" },
+        "confidenceLimitingFactors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "primaryDrivers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "suggestedPhases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Phase" }
+        },
+        "sowCaveats": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changeOrderRisks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "disclaimer": { "type": "string" }
+      }
+    },
+
+    "rcaOpportunities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/RcaOpportunity" }
+    },
+
+    "expansionSignals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ExpansionSignal" }
+    },
+
+    "codeInventory": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/CodeArtifact" }
+    },
+
+    "rcaBenefitMapping": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/BenefitMappingEntry" }
+    },
+
+    "salesTalkingPoints": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TalkingPoint" }
+    },
+
+    "implementationFindings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ImplementationFinding" }
+    },
+
+    "aiNarratives": {
+      "type": "object",
+      "required": ["executive", "sales", "salesforce"],
+      "additionalProperties": false,
+      "properties": {
+        "executive": { "type": "string" },
+        "sales": { "type": "string" },
+        "salesforce": { "type": "string" }
+      }
+    }
+  },
+
+  "$defs": {
+    "ComplexityTier": {
+      "type": "string",
+      "enum": ["Low", "Medium", "High", "Very High"]
+    },
+
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["High", "Medium", "Low"]
+    },
+
+    "DraftConfidence": {
+      "type": "string",
+      "enum": ["High", "Medium", "Low", "Manual_Review_Required"]
+    },
+
+    "Severity": {
+      "type": "string",
+      "enum": ["Info", "Low", "Medium", "High", "Critical"]
+    },
+
+    "RcaTargetPattern": {
+      "type": "string",
+      "enum": [
+        "Pricing_Procedure",
+        "Price_Adjustment_Method",
+        "CML_Constraint",
+        "CML_Relationship",
+        "Declarative_Configuration",
+        "Flow_Extension",
+        "Apex_Invocable_Extension",
+        "Manual_Design_Required"
+      ]
+    },
+
+    "SourceType": {
+      "type": "string",
+      "enum": [
+        "QCP_JavaScript",
+        "Apex_Class",
+        "Apex_Trigger",
+        "Price_Rule",
+        "Product_Rule",
+        "Discount_Schedule",
+        "Summary_Variable",
+        "Lookup_Query"
+      ]
+    },
+
+    "UsageSignal": {
+      "type": "string",
+      "enum": ["Confirmed_Usage", "Active_Or_Referenced", "Unknown", "Deprecated_Or_Inactive"]
+    },
+
+    "ExpansionModule": {
+      "type": "string",
+      "enum": [
+        "DRO",
+        "Billing",
+        "Advanced_Approvals",
+        "Usage_Management",
+        "Revenue_Recognition",
+        "CLM",
+        "Product_Discovery",
+        "Token_Overage",
+        "Agentforce"
+      ]
+    },
+
+    "TalkingPointContext": {
+      "type": "string",
+      "enum": ["discovery_call", "sow_review", "executive_meeting", "salesforce_handoff"]
+    },
+
+    "CandidateLanguage": {
+      "type": "string",
+      "enum": ["cml", "apex", "json", "pseudocode"]
+    },
+
+    "ScoredDimension": {
+      "type": "object",
+      "required": ["score", "tier", "signal", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "tier": { "$ref": "#/$defs/ComplexityTier" },
+        "signal": { "type": "string", "description": "Short factual phrase, e.g. '47 price rules, 13 QCP scripts'" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "Concern": {
+      "type": "object",
+      "required": ["id", "title", "severity", "audienceFraming", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "severity": { "$ref": "#/$defs/Severity" },
+        "audienceFraming": {
+          "type": "object",
+          "required": ["executive", "sales", "salesforce"],
+          "additionalProperties": false,
+          "properties": {
+            "executive": {
+              "type": "object",
+              "required": ["headline", "impact", "nextAction"],
+              "additionalProperties": false,
+              "properties": {
+                "headline": { "type": "string" },
+                "impact": { "type": "string" },
+                "nextAction": { "type": "string" }
+              }
+            },
+            "sales": {
+              "type": "object",
+              "required": ["headline", "sowCaveat", "talkingPoint"],
+              "additionalProperties": false,
+              "properties": {
+                "headline": { "type": "string" },
+                "sowCaveat": { "type": "string" },
+                "talkingPoint": { "type": "string" }
+              }
+            },
+            "salesforce": {
+              "type": "object",
+              "required": ["headline", "migrationRisk"],
+              "additionalProperties": false,
+              "properties": {
+                "headline": { "type": "string" },
+                "migrationRisk": { "type": "string" }
+              }
+            }
+          }
+        },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "Phase": {
+      "type": "object",
+      "required": ["name", "durationWeeks", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "durationWeeks": {
+          "type": "object",
+          "required": ["low", "high"],
+          "additionalProperties": false,
+          "properties": {
+            "low": { "type": "integer", "minimum": 1 },
+            "high": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "description": { "type": "string" }
+      }
+    },
+
+    "RcaOpportunity": {
+      "type": "object",
+      "required": ["id", "cpqFinding", "rcaCapability", "rcaTargetPattern", "businessBenefit", "expansionSignal", "confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "cpqFinding": { "type": "string" },
+        "rcaCapability": { "type": "string", "description": "Canonical RCA term per KB Section 1" },
+        "rcaTargetPattern": { "type": "string" },
+        "businessBenefit": { "type": "string" },
+        "expansionSignal": { "type": ["string", "null"] },
+        "confidence": { "$ref": "#/$defs/ConfidenceLevel" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "ExpansionSignal": {
+      "type": "object",
+      "required": ["module", "triggerCondition", "consultativeFraming", "confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "module": { "$ref": "#/$defs/ExpansionModule" },
+        "triggerCondition": { "type": "string" },
+        "consultativeFraming": {
+          "type": "string",
+          "description": "'May be relevant if...' style. Never 'you should buy'."
+        },
+        "confidence": { "$ref": "#/$defs/ConfidenceLevel" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "Dependency": {
+      "type": "object",
+      "required": ["type", "name", "reference"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string", "enum": ["object", "field", "rule", "integration"] },
+        "name": { "type": "string" },
+        "reference": { "type": "string" }
+      }
+    },
+
+    "MigrationDraft": {
+      "type": "object",
+      "required": [
+        "generatedCandidate",
+        "candidateLanguage",
+        "plainLanguageExplanation",
+        "targetPatternReasoning",
+        "preservedBehavior",
+        "changedBehavior",
+        "unknowns",
+        "requiredTests",
+        "humanReviewRequired",
+        "reviewReasons"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "generatedCandidate": { "type": "string" },
+        "candidateLanguage": { "$ref": "#/$defs/CandidateLanguage" },
+        "plainLanguageExplanation": { "type": "string" },
+        "targetPatternReasoning": { "type": "string" },
+        "preservedBehavior": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changedBehavior": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requiredTests": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "humanReviewRequired": { "type": "boolean" },
+        "reviewReasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "CodeArtifact": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "sourceType",
+        "sourceCode",
+        "businessPurpose",
+        "usageSignal",
+        "complexityScore",
+        "dependencies",
+        "recommendedRcaTarget",
+        "conversionConfidence",
+        "draft",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "sourceType": { "$ref": "#/$defs/SourceType" },
+        "sourceCode": { "type": "string" },
+        "businessPurpose": { "type": "string" },
+        "usageSignal": { "$ref": "#/$defs/UsageSignal" },
+        "complexityScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Dependency" }
+        },
+        "recommendedRcaTarget": { "$ref": "#/$defs/RcaTargetPattern" },
+        "conversionConfidence": { "$ref": "#/$defs/DraftConfidence" },
+        "draft": { "$ref": "#/$defs/MigrationDraft" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "BenefitMappingEntry": {
+      "type": "object",
+      "required": ["cpqPainPoint", "rcaCapability", "businessBenefit", "salesforceExpansion", "confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "cpqPainPoint": { "type": "string" },
+        "rcaCapability": { "type": "string" },
+        "businessBenefit": { "type": "string" },
+        "salesforceExpansion": { "type": ["string", "null"] },
+        "confidence": { "$ref": "#/$defs/ConfidenceLevel" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "TalkingPoint": {
+      "type": "object",
+      "required": ["context", "point", "supportingData"],
+      "additionalProperties": false,
+      "properties": {
+        "context": { "$ref": "#/$defs/TalkingPointContext" },
+        "point": { "type": "string" },
+        "supportingData": { "type": "string" }
+      }
+    },
+
+    "ImplementationFinding": {
+      "type": "object",
+      "required": ["category", "severity", "finding", "technicalDetail", "recommendedAction", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "category": { "type": "string" },
+        "severity": { "$ref": "#/$defs/Severity" },
+        "finding": { "type": "string" },
+        "technicalDetail": { "type": "string" },
+        "recommendedAction": { "type": "string" },
+        "evidence": { "$ref": "#/$defs/EvidenceTrail" }
+      }
+    },
+
+    "EvidenceTrail": {
+      "type": "object",
+      "required": ["summary", "detailed", "raw"],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": { "type": "string" },
+          "description": "Executive-readable bullets, 3–5 items"
+        },
+        "detailed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["metric", "value", "source"],
+            "additionalProperties": false,
+            "properties": {
+              "metric": { "type": "string" },
+              "value": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "number" }
+                ]
+              },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "raw": {
+          "type": "object",
+          "required": ["artifactReferences"],
+          "additionalProperties": false,
+          "properties": {
+            "artifactReferences": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "metadataExtracts": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
