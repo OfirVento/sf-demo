@@ -3,6 +3,7 @@ import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { TopBar } from '@/components/shell/TopBar';
 import { AgentPanel } from '@/components/shared/AgentPanel';
 import { EvidenceDrawer } from '@/components/shared/EvidenceDrawer';
+import { KbDrawer } from '@/components/shared/KbDrawer';
 import { TruthLabelLegend } from '@/components/shared/TruthLabelLegend';
 import { loadAssessmentPayload } from '@/lib/assessment/loader';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
@@ -55,6 +56,7 @@ function AppShell() {
         <AgentPanel layer={layer} />
       </div>
       <EvidenceDrawer />
+      <KbDrawer />
       <TruthLabelLegend />
     </div>
   );

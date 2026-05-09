@@ -19,7 +19,7 @@ export function EvidenceDrawer() {
         className="absolute inset-0 bg-foreground/20"
         onClick={close}
       />
-      <aside className="absolute right-0 top-0 h-full w-full max-w-md border-l border-border bg-card shadow-xl transition-transform duration-300 ease-out">
+      <aside className="absolute right-0 top-0 flex h-full w-96 flex-col border-l border-border bg-card shadow-xl transition-transform duration-300 ease-out">
         <header className="flex items-center justify-between border-b border-border px-6 py-4">
           <div>
             <h2 className="text-base font-semibold text-foreground">Evidence</h2>
@@ -53,7 +53,7 @@ export function EvidenceDrawer() {
           ))}
         </nav>
 
-        <div className="overflow-y-auto px-6 py-5 text-sm" style={{ maxHeight: 'calc(100% - 9rem)' }}>
+        <div className="flex-1 overflow-y-auto px-6 py-5 text-sm">
           {tab === 'summary' && (
             <ul className="list-disc space-y-2 pl-4 text-foreground/90">
               {trail.summary.map((s, i) => (

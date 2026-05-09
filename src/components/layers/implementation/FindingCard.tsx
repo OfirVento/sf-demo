@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SeverityBadge } from '@/components/shared/Badges';
 import { EvidenceLink } from '@/components/shared/EvidenceLink';
+import { TruthLabel } from '@/components/shared/TruthLabel';
 import type { ImplementationFinding } from '@/types/assessment';
 
 function slug(s: string) {
@@ -25,7 +26,10 @@ export function FindingCard({ finding, index }: Props) {
     >
       <header className="flex items-start gap-3">
         <SeverityBadge severity={finding.severity} className="mt-0.5" />
-        <h3 className="text-base font-semibold leading-snug text-foreground">{finding.finding}</h3>
+        <h3 className="flex-1 text-base font-semibold leading-snug text-foreground">
+          {finding.finding}
+        </h3>
+        <TruthLabel variant="ai_generated" className="shrink-0" />
       </header>
 
       <div className="mt-3 space-y-3 text-sm">

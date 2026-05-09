@@ -56,18 +56,23 @@ Every surface that displays AI-generated content, heuristics, or sample data car
 
 ## Environment variables (M3+)
 
+Copy `.env.example` to `.env` and fill in:
+
 ```
-VITE_ANTHROPIC_API_KEY=...   # Required for the runtime agent panel from M3 onward
+VITE_AGENT_MODEL=claude-sonnet-4
+VITE_ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+`VITE_*` env vars are exposed in the browser bundle by Vite. The Anthropic SDK is initialised with `dangerouslyAllowBrowser: true` — acceptable for the AllCloud demo on a controlled URL, never for a public production environment. The agent panel and the Executive narrative re-roll both use this key; both fail gracefully with an error message if it's missing.
 
 ## Build sequence
 
 | Milestone | Status |
 |---|---|
 | M0 — Skeleton (routing, shell, design tokens, stores, payload loader, truth labels, evidence drawer scaffold) | **Done** |
-| M1 — Layer 5 (Implementation) | Pending |
-| M2 — Layer 1 (Executive) | Pending |
-| M3 — Cross-cutting (Anthropic agent, full evidence drawer, narrative re-rolls) | Pending |
+| M1 — Layer 5 (Implementation) | **Done** |
+| M2 — Layer 1 (Executive) | **Done** |
+| M3 — Cross-cutting (Anthropic agent, full evidence drawer, narrative re-rolls) | **Done** |
 | M4 — Layer 2 (Sales) | Pending |
 | M5 — Layer 3 (Salesforce Partner + briefing export) | Pending |
 | M6 — Layer 4 (Migration drafts, three-pane viewer, bulk draft) | Pending |
