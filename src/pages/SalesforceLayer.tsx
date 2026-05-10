@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FileDown } from 'lucide-react';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { ReadinessHeader } from '@/components/layers/salesforce/ReadinessHeader';
 import { ExpansionSignalsGrid } from '@/components/layers/salesforce/ExpansionSignalsGrid';
 import { MigrationRiskHeatmap } from '@/components/layers/salesforce/MigrationRiskHeatmap';
@@ -23,7 +23,7 @@ export function SalesforceLayer() {
             Account-team view: readiness verdict, expansion signals, migration risk, co-sell.
           </p>
         </div>
-        <TruthLabel variant="sample_data" />
+        <PayloadTruthLabel />
       </div>
 
       {/* 1. Readiness verdict header */}

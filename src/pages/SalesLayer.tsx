@@ -1,5 +1,5 @@
 import { useAssessmentStore } from '@/store/useAssessmentStore';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { TalkingPointsBlock } from '@/components/layers/sales/TalkingPointsBlock';
 import { ChartCard } from '@/components/layers/sales/ChartCard';
 import {
@@ -30,7 +30,7 @@ export function SalesLayer() {
             Talking points, screenshot-ready charts, and LOE / SOW scaffolding.
           </p>
         </div>
-        <TruthLabel variant="sample_data" />
+        <PayloadTruthLabel />
       </div>
 
       {/* Talking points (left) + chart cards (right) */}

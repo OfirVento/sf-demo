@@ -66,12 +66,12 @@ function AppShell() {
 
 export function App() {
   const setPayload = useAssessmentStore((s) => s.setPayload);
-  const userTheme = useThemeStore((s) => s.theme);
   const result = loadAssessmentPayload();
 
-  useEffect(() => {
-    applyTheme(userTheme);
-  }, [userTheme]);
+  // Theme application is owned exclusively by AppShell so the layer-aware
+  // override (Layer 4 forced dark) doesn't get clobbered by a userTheme-only
+  // effect at this level. The ThemeToggle still calls applyTheme() directly
+  // for an immediate flip, and AppShell's effect re-runs to confirm.
 
   useEffect(() => {
     if (result.ok) setPayload(result.payload);

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { useAssessmentStore } from '@/store/useAssessmentStore';
 
 export function Landing() {
@@ -7,7 +7,7 @@ export function Landing() {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-3xl flex-col justify-center px-6 py-16">
       <div className="space-y-6">
-        <TruthLabel variant="sample_data" />
+        <PayloadTruthLabel />
         <h1 className="text-4xl font-semibold tracking-tight text-foreground">
           Connect a Salesforce CPQ org.
         </h1>

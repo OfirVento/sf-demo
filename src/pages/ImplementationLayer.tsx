@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Lock } from 'lucide-react';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { FindingCard } from '@/components/layers/implementation/FindingCard';
 import type { ImplementationFinding, Severity } from '@/types/assessment';
 
@@ -62,7 +62,7 @@ export function ImplementationLayer() {
             {totalFindings} findings across {grouped.length} categories.
           </p>
         </div>
-        <TruthLabel variant="sample_data" />
+        <PayloadTruthLabel />
       </div>
 
       {/* Two-column layout */}

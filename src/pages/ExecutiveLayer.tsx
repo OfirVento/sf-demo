@@ -1,5 +1,5 @@
 import { useAssessmentStore } from '@/store/useAssessmentStore';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { HeroVerdict } from '@/components/layers/executive/HeroVerdict';
 import { HeroVisual } from '@/components/layers/executive/HeroVisual';
 import { ConcernCard } from '@/components/layers/executive/ConcernCard';
@@ -20,7 +20,7 @@ export function ExecutiveLayer() {
             Verdict, top concerns, time-to-value framing.
           </p>
         </div>
-        <TruthLabel variant="sample_data" />
+        <PayloadTruthLabel />
       </div>
 
       {/* 1. Hero verdict block */}

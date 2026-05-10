@@ -3,7 +3,7 @@ import { Columns2, Rows2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
 import { useMigrationStore } from '@/store/useMigrationStore';
-import { TruthLabel } from '@/components/shared/TruthLabel';
+import { PayloadTruthLabel } from "@/components/shared/PayloadTruthLabel";
 import { InventoryList } from '@/components/layers/migration/InventoryList';
 import { MetadataBar } from '@/components/layers/migration/MetadataBar';
 import { SourcePane } from '@/components/layers/migration/SourcePane';
@@ -75,7 +75,7 @@ export function MigrationLayer() {
               Side-by-side diff
             </button>
           </div>
-          <TruthLabel variant="sample_data" />
+          <PayloadTruthLabel />
         </div>
       </div>
 
