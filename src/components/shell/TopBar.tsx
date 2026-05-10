@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
 import { TruthLabel, type TruthLabelVariant } from '@/components/shared/TruthLabel';
+import { GuidedWorkflowTrigger } from '@/components/shared/GuidedWorkflow';
 import { LayerSwitcher } from './LayerSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -33,6 +34,7 @@ export function TopBar() {
       <div className="flex items-center gap-4">
         <LayerSwitcher />
         <TruthLabel variant={variant} />
+        <GuidedWorkflowTrigger />
         <ThemeToggle />
       </div>
     </header>

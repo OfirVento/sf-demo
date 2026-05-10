@@ -41,8 +41,17 @@ const PREBUILT_BY_LAYER: Record<string, string[]> = {
 };
 
 export function AgentPanel({ layer }: { layer: string }) {
-  const { open, toggle, messages, append, patch, controller, setController, abort } =
-    useAgentStore();
+  const {
+    open,
+    toggle,
+    messages,
+    append,
+    patch,
+    controller,
+    setController,
+    abort,
+    dropTrailingEmptyAssistant,
+  } = useAgentStore();
   const payload = useAssessmentStore((s) => s.payload);
   const prebuilts = PREBUILT_BY_LAYER[layer] ?? PREBUILT_BY_LAYER.default;
   const [input, setInput] = useState('');
@@ -55,6 +64,11 @@ export function AgentPanel({ layer }: { layer: string }) {
 
   async function send(question: string) {
     if (!payload || !question.trim() || isStreaming) return;
+
+    // Defensive: if the previous turn left an errored or empty trailing
+    // assistant message in history, drop it before posting — the API
+    // rejects empty assistant turns.
+    dropTrailingEmptyAssistant();
 
     append({ role: 'user', content: question.trim() });
     const assistantId = append({ role: 'assistant', content: '', streaming: true });
@@ -77,8 +91,13 @@ export function AgentPanel({ layer }: { layer: string }) {
         patch(assistantId, { content: buf });
       },
       onDone: (finalText) => {
-        patch(assistantId, { content: finalText || buf, streaming: false });
+        const text = finalText || buf;
+        patch(assistantId, { content: text, streaming: false });
         setController(null);
+        // If user aborted before any tokens streamed, drop the empty
+        // assistant message so the next send doesn't 400 with
+        // {role: 'assistant', content: ''}.
+        if (!text || !text.trim()) dropTrailingEmptyAssistant();
       },
       onError: (err) => {
         patch(assistantId, {
@@ -87,6 +106,10 @@ export function AgentPanel({ layer }: { layer: string }) {
           error: err.message,
         });
         setController(null);
+        // Errored assistant message is also problematic on next send —
+        // drop it after the error has been surfaced briefly. We keep it
+        // visible by marking it errored; the drop only fires next time
+        // the user types something. (Handled in send() guard below.)
       },
     });
   }

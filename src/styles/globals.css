@@ -76,4 +76,26 @@
   .focus-ring {
     @apply outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2;
   }
+
+  /* Page-fade for route transitions. Mounted on the Outlet wrapper with
+     a key on the path; React remounts → animation replays. */
+  .route-fade {
+    animation: route-fade-in 220ms ease-out;
+  }
+  @keyframes route-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-fade {
+    animation: none;
+  }
 }

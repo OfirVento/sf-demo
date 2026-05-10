@@ -4,6 +4,7 @@ import { TopBar } from '@/components/shell/TopBar';
 import { AgentPanel } from '@/components/shared/AgentPanel';
 import { EvidenceDrawer } from '@/components/shared/EvidenceDrawer';
 import { KbDrawer } from '@/components/shared/KbDrawer';
+import { GuidedWorkflow } from '@/components/shared/GuidedWorkflow';
 import { TruthLabelLegend } from '@/components/shared/TruthLabelLegend';
 import { loadAssessmentPayload } from '@/lib/assessment/loader';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
@@ -50,13 +51,14 @@ function AppShell() {
     <div className="flex h-screen flex-col bg-background text-foreground">
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-y-auto">
+        <main key={location.pathname} className="route-fade flex-1 overflow-y-auto">
           <Outlet />
         </main>
         <AgentPanel layer={layer} />
       </div>
       <EvidenceDrawer />
       <KbDrawer />
+      <GuidedWorkflow />
       <TruthLabelLegend />
     </div>
   );

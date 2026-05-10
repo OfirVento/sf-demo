@@ -27,7 +27,12 @@ export type AskAgentArgs = {
  * Stream an agent response. Returns when the stream resolves; tokens are
  * emitted via onText, the final text + token usage via onDone, and any
  * error via onError. Cancel by aborting the AbortSignal passed in.
+ *
+ * Wraps the user's signal with a 30s wall-clock timeout so a hung connection
+ * can't keep the panel locked indefinitely.
  */
+const STREAM_TIMEOUT_MS = 30_000;
+
 export async function askAgent({
   question,
   history,
@@ -38,6 +43,16 @@ export async function askAgent({
   onDone,
   onError,
 }: AskAgentArgs): Promise<void> {
+  // Compose the caller's abort signal with a wall-clock timeout. Either
+  // firing aborts the SDK request.
+  const composed = new AbortController();
+  const onCallerAbort = () => composed.abort();
+  if (signal) {
+    if (signal.aborted) composed.abort();
+    else signal.addEventListener('abort', onCallerAbort, { once: true });
+  }
+  const timeoutId = setTimeout(() => composed.abort(), STREAM_TIMEOUT_MS);
+
   try {
     const client = getClient();
     const messages: Anthropic.MessageParam[] = [
@@ -55,7 +70,7 @@ export async function askAgent({
         system: buildSystemBlocks(payload, layer),
         messages,
       },
-      signal ? { signal } : undefined,
+      { signal: composed.signal },
     );
 
     stream.on('text', (delta) => onText(delta));
@@ -67,11 +82,18 @@ export async function askAgent({
       .join('');
     onDone(finalText, final.usage);
   } catch (err) {
-    if ((err as { name?: string })?.name === 'AbortError') {
+    const name = (err as { name?: string })?.name;
+    if (name === 'AbortError' || composed.signal.aborted) {
+      // Distinguish user-abort from timeout. Both call onDone('') so the
+      // partial-content path in the panel still works — the panel decides
+      // whether to keep or drop the trailing empty assistant.
       onDone('', undefined);
       return;
     }
     onError(err instanceof Error ? err : new Error(String(err)));
+  } finally {
+    clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', onCallerAbort);
   }
 }
 

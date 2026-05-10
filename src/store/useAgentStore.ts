@@ -23,6 +23,10 @@ type State = {
   patch: (id: string, patch: Partial<AgentMessage>) => void;
   /** Drop the message and any after it. Used for re-roll. */
   truncateAfter: (id: string) => void;
+  /** Drop the trailing message if it's an empty/errored assistant. Prevents
+   * the next user send from posting `{role: 'assistant', content: ''}` to
+   * the API (which 400s) after a mid-stream abort. */
+  dropTrailingEmptyAssistant: () => void;
   setController: (c: AbortController | null) => void;
   abort: () => void;
   reset: () => void;
@@ -48,6 +52,16 @@ export const useAgentStore = create<State>((set, get) => ({
       const idx = s.messages.findIndex((m) => m.id === id);
       if (idx === -1) return s;
       return { messages: s.messages.slice(0, idx) };
+    }),
+  dropTrailingEmptyAssistant: () =>
+    set((s) => {
+      const last = s.messages[s.messages.length - 1];
+      if (!last || last.role !== 'assistant') return s;
+      const isEmpty = !last.content || last.content.trim() === '';
+      if (isEmpty || last.error) {
+        return { messages: s.messages.slice(0, -1) };
+      }
+      return s;
     }),
   setController: (controller) => set({ controller }),
   abort: () => {
