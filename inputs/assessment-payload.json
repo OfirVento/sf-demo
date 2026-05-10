@@ -2,9 +2,9 @@
   "meta": {
     "assessmentId": "asm-allcloud-demo-001",
     "generatedAt": "2026-05-08T00:00:00.000Z",
-    "orgName": "Acme Cloud Holdings (sample)",
-    "orgIdentifier": "00DSAMPLEORG000",
-    "truthLabel": "sample_data",
+    "orgName": "Vector Systems",
+    "orgIdentifier": "00D3x000001AjYCEA0",
+    "truthLabel": "real_org_data",
     "schemaVersion": "1.0"
   },
   "orgProfile": {
@@ -1013,7 +1013,7 @@
     },
     {
       "id": "q-002",
-      "name": "Bundle-aware pricing adjustment (QCP)",
+      "name": "Q2CBundleSpecific (QCP) — bundle-aware pricing adjustment",
       "sourceType": "QCP_JavaScript",
       "sourceCode": "// QCP: Adjust price of bundle children based on parent bundle attributes.\n// Loops bundles, walks children, applies attribute-driven uplift.\nexport function onAfterCalculate(quoteModel, quoteLineModels) {\n  return new Promise((resolve) => {\n    const bundles = quoteLineModels.filter((l) => l.record[\"SBQQ__Bundle__c\"]);\n    bundles.forEach((b) => {\n      const tier = b.record[\"Bundle_Tier__c\"];\n      const uplift = tier === \"Premium\" ? 0.15 : tier === \"Plus\" ? 0.08 : 0;\n      const childIds = b.record[\"SBQQ__BundledLines__r\"] || [];\n      quoteLineModels\n        .filter((l) => childIds.includes(l.record[\"Id\"]))\n        .forEach((c) => {\n          c.record[\"SBQQ__ListPrice__c\"] *= 1 + uplift;\n        });\n    });\n    resolve();\n  });\n}",
       "businessPurpose": "Increases child line list price by a bundle-tier uplift (Premium = 15%, Plus = 8%).",
@@ -1085,7 +1085,8 @@
           "artifactReferences": [
             "QuoteCalculatorPlugin.js",
             "Bundle_Tier__c",
-            "SBQQ__BundledLines__r"
+            "SBQQ__BundledLines__r",
+            "SBQQ__CustomScript__c[Name=Q2CBundleSpecific]"
           ]
         }
       }
@@ -1641,9 +1642,9 @@
     },
     {
       "id": "pr-001",
-      "name": "Volume-based discount price rule",
+      "name": "Multi Intel Asset Discount Rule",
       "sourceType": "Price_Rule",
-      "sourceCode": "Price Rule: \"PR_VolumeDiscount_Standard\"\n  Active: true\n  Conditions Met: All\n  Conditions:\n    - QuoteLine.Quantity ≥ 10\n  Actions:\n    - Set QuoteLine.SBQQ__AdditionalDiscount__c = 5\n  Calc Order: 200",
+      "sourceCode": "Price Rule: \"Multi Intel Asset Discount Rule\"\n  Active: true\n  Conditions Met: All\n  Conditions:\n    - QuoteLine.Quantity ≥ 10\n  Actions:\n    - Set QuoteLine.SBQQ__AdditionalDiscount__c = 5\n  Calc Order: 200",
       "businessPurpose": "Applies a 5% additional discount to any quote line with a quantity of 10 or more.",
       "usageSignal": "Confirmed_Usage",
       "complexityScore": 22,
@@ -1697,7 +1698,8 @@
         ],
         "raw": {
           "artifactReferences": [
-            "PR_VolumeDiscount_Standard"
+            "PR_VolumeDiscount_Standard",
+            "SBQQ__PriceRule__c[Name=Multi Intel Asset Discount Rule]"
           ]
         }
       }

@@ -140,7 +140,7 @@ export function onAfterCalculate(quoteModel, quoteLineModels, conn) {
   },
   {
     id: 'q-002',
-    name: 'Bundle-aware pricing adjustment (QCP)',
+    name: 'Q2CBundleSpecific (QCP) — bundle-aware pricing adjustment',
     sourceType: 'QCP_JavaScript',
     sourceCode: `// QCP: Adjust price of bundle children based on parent bundle attributes.
 // Loops bundles, walks children, applies attribute-driven uplift.
@@ -216,7 +216,12 @@ export function onAfterCalculate(quoteModel, quoteLineModels) {
         { metric: 'Bundle tiers observed', value: 3, source: 'Static analysis' },
         { metric: 'Bundles in catalog', value: 28, source: 'Org scan' },
       ],
-      ['QuoteCalculatorPlugin.js', 'Bundle_Tier__c', 'SBQQ__BundledLines__r'],
+      [
+        'QuoteCalculatorPlugin.js',
+        'Bundle_Tier__c',
+        'SBQQ__BundledLines__r',
+        'SBQQ__CustomScript__c[Name=Q2CBundleSpecific]',
+      ],
     ),
   },
   {
@@ -831,9 +836,9 @@ trigger CPQ_QuoteApprovalRouting on SBQQ__Quote__c (before update) {
   // ---------- Price rules (4) ----------
   {
     id: 'pr-001',
-    name: 'Volume-based discount price rule',
+    name: 'Multi Intel Asset Discount Rule',
     sourceType: 'Price_Rule',
-    sourceCode: `Price Rule: "PR_VolumeDiscount_Standard"
+    sourceCode: `Price Rule: "Multi Intel Asset Discount Rule"
   Active: true
   Conditions Met: All
   Conditions:
@@ -885,7 +890,10 @@ trigger CPQ_QuoteApprovalRouting on SBQQ__Quote__c (before update) {
         { metric: 'Conditions', value: 1, source: 'Price rule definition' },
         { metric: 'Actions', value: 1, source: 'Price rule definition' },
       ],
-      ['PR_VolumeDiscount_Standard'],
+      [
+        'PR_VolumeDiscount_Standard',
+        'SBQQ__PriceRule__c[Name=Multi Intel Asset Discount Rule]',
+      ],
     ),
   },
   {
@@ -2488,9 +2496,9 @@ const payload: AssessmentPayload = {
   meta: {
     assessmentId: 'asm-allcloud-demo-001',
     generatedAt: '2026-05-08T00:00:00.000Z',
-    orgName: 'Acme Cloud Holdings (sample)',
-    orgIdentifier: '00DSAMPLEORG000',
-    truthLabel: 'sample_data',
+    orgName: 'Vector Systems',
+    orgIdentifier: '00D3x000001AjYCEA0',
+    truthLabel: 'real_org_data',
     schemaVersion: '1.0',
   },
   orgProfile: {
